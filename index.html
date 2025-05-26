@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reading Entry Form</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f8f8;
+        padding: 20px;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        width: 60%;
+        height: 250px;
+        justify-content: space-around;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        date,
+        vehicle {
+          display: flex;
+          flex-direction: column;
+          margin-bottom: 10px;
+        }
+        input {
+          padding: 10px;
+          margin: 5px 0;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          font-size: 14px;
+        }
+      }
+
+      table {
+        margin: 2px auto;
+        width: 60%;
+        border: 1px solid #000;
+        border-collapse: collapse;
+      }
+
+      td {
+        border: 1px solid #000;
+        padding: 0px;
+        font-size: 10px;
+        text-align: center;
+      }
+
+      button {
+        margin: 5px 0;
+        padding: 10px 15px;
+        background-color: #03a9b5;
+        color: white;
+        width: 200;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .clear_copy_btns {
+        display: flex;
+        justify-content: space-around;
+        margin: 10px auto;
+        padding: 5px;
+      }
+
+      .reading {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .btn_msgs {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
+        margin: 10px auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form" id="form">
+      <form id="readingForm">
+        <div class="date">
+          <label for="Date">Date:</label>
+          <input type="date" id="date" name="date" required />
+        </div>
+        <div class="vehicle">
+          <label for="vehicle_no">Vehicle No:</label>
+          <select name="vehicle_no" id="vehicle_no" required>
+            <optgroup>
+              <option value="" selected disabled>Select</option>
+              <option value="xyz1">xyz1</option>
+              <option value="xyz2">xyz2</option>
+              <option value="xyz3">xyz3</option>
+              <option value="xyz4">xyz4</option>
+              <option value="xyz5">xyz5</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="reading">
+          <label for="start_reading">Start Reading:</label>
+          <input
+            type="number"
+            id="start_reading"
+            name="start_reading"
+            required
+          />
+          <br />
+          <label for="end_reading">End Reading:</label>
+          <input type="number" id="end_reading" name="end_reading" required />
+        </div>
+        <div class="btn_msgs">
+          <button type="submit">Add</button>
+          <div id="message" style="color: green; margin-top: 10px;"></div>
+        </div>
+      </form>
+    </div>
+    <div class="clear_copy_btns">
+      <button onclick="copyTable()">Copy Table</button>
+      <button onclick="clearTable()">Clear Table</button>
+    </div>
+    <table id="readingTable">
+      <thead>
+        <tr>
+          <th>Sno</th>
+          <th>Date</th>
+          <th>Vehicle No</th>
+          <th>Start Reading</th>
+          <th>End Reading</th>
+          <th>Total</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <script>
+      const form = document.getElementById("readingForm");
+      const tableBody = document.querySelector("#readingTable tbody");
+
+      function loadEntries() {
+        const entries =
+          JSON.parse(localStorage.getItem("readingEntries")) || [];
+        tableBody.innerHTML = "";
+        entries.forEach((entry, index) => { 
+            const sno = index + 1;
+          const row = document.createElement("tr");
+          row.innerHTML = `
+                    <td>${sno}</td>
+                    <td>${entry.date}</td>
+                    <td>${entry.vehicle_no}</td>
+                    <td>${entry.startReading}</td>
+                    <td>${entry.endReading}</td>
+                    <td>${entry.diffReading}</td>
+                    <td><button onclick="deleteEntry(${index})">Delete</button></td>
+                `;
+          tableBody.appendChild(row);
+        });
+      }
+
+     function copyTable() {
+  const rows = document.querySelectorAll("#readingTable tr");
+  let tableText = "";
+
+  rows.forEach((row, rowIndex) => {
+    const cells = Array.from(row.cells);
+    // Exclude the last column (Action)
+    const trimmedCells = rowIndex === 0 ? cells.slice(0, -1) : cells.slice(0, -1);
+    const rowText = trimmedCells.map(cell => cell.textContent).join("\t");
+    tableText += rowText + "\n";
+  });
+
+  // Copy to clipboard
+  const textarea = document.createElement("textarea");
+  textarea.value = tableText;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+
+  alert("Table content copied to clipboard.");
+}
+
+
+      function clearTable() {
+        if (confirm("Are you sure you want to clear the table?")) {
+          localStorage.removeItem("readingEntries");
+          loadEntries();
+          alert("Table cleared.");
+        }
+      }
+
+      function deleteEntry(index) {
+        const entries =
+          JSON.parse(localStorage.getItem("readingEntries")) || [];
+        entries.splice(index, 1);
+        localStorage.setItem("readingEntries", JSON.stringify(entries));
+        loadEntries();
+      }
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const date = document.getElementById("date").value;
+        const vehicle_no = document.getElementById("vehicle_no").value;
+        const startReading = document.getElementById("start_reading").value;
+        const endReading = document.getElementById("end_reading").value;
+
+        if (date && vehicle_no && startReading && endReading) {
+          const diffReading = endReading - startReading;
+          const newEntry = {
+            date,
+            vehicle_no,
+            startReading,
+            endReading,
+            diffReading,
+          };
+
+          const entries =
+            JSON.parse(localStorage.getItem("readingEntries")) || [];
+          entries.push(newEntry);
+          localStorage.setItem("readingEntries", JSON.stringify(entries));
+
+          loadEntries();
+          form.reset();
+          const messageDiv = document.getElementById("message");
+          messageDiv.textContent = "Entry added successfully!";
+          setTimeout(() => {
+            messageDiv.textContent = "";
+          }, 3000); // clears message after 3 seconds
+        } else {
+          alert("Please fill in all fields.");
+        }
+      });
+
+      // Load any existing entries on page load
+      window.onload = loadEntries;
+    </script>
+  </body>
+</html>
