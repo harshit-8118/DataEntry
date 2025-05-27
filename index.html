@@ -21,7 +21,7 @@
         display: flex;
         flex-direction: column;
         width: 60%;
-        height: 250px;
+        height: 280px;
         justify-content: space-around;
         margin: 20px auto;
         padding: 20px;
@@ -33,6 +33,12 @@
           display: flex;
           flex-direction: column;
           margin-bottom: 10px;
+        }
+        .heading{
+          text-align: center;
+          margin-bottom: 10px;
+          font-size: 24px;
+          color: #333;
         }
         input {
           padding: 10px;
@@ -123,7 +129,7 @@
         }
 
         .btn_msgs {
-          flex-direction: column;
+          flex-direction: row;
         }
       }
       @media (max-width: 600px) {
@@ -141,8 +147,7 @@
         }
 
         .btn_msgs {
-          flex-direction: column;
-          align-items: stretch;
+          flex-direction: row;
         }
 
         table {
@@ -154,6 +159,7 @@
   <body>
     <div class="form" id="form">
       <form id="readingForm">
+        <h2 class="heading">ENTRY FORM</h2>
         <div class="date">
           <label for="Date">Date:</label>
           <input type="date" id="date" name="date" required />
@@ -163,11 +169,15 @@
           <select name="vehicle_no" id="vehicle_no" required>
             <optgroup>
               <option value="" selected disabled>Select</option>
-              <option value="xyz1">xyz1</option>
-              <option value="xyz2">xyz2</option>
-              <option value="xyz3">xyz3</option>
-              <option value="xyz4">xyz4</option>
-              <option value="xyz5">xyz5</option>
+              <option value="UP32XY1234">UP32XY1234</option>
+              <option value="UP32XY1234">UP32XY1234</option>
+              <option value="UP32XY1234">UP32XY1234</option>
+              <option value="UP32XY1234">UP32XY1234</option>
+              <option value="UP32XY1234">UP32XY1234</option>
+              <option value="UP32XY1234">UP32XY1234</option>
+              <option value="UP32XY1234">UP32XY1234</option>
+              <option value="UP32XY1234">UP32XY1234</option>
+              <option value="UP32XY1234">UP32XY1234</option>
             </optgroup>
           </select>
         </div>
@@ -274,10 +284,15 @@
         loadEntries();
       }
 
+      function formatDate(dateString) {
+        const [year, month, day] = dateString.split("-");
+        return `${day}-${month}-${year}`;
+      }
+
       form.addEventListener("submit", function (event) {
         event.preventDefault();
 
-        const date = document.getElementById("date").value;
+        const date = formatDate(document.getElementById("date").value);
         const vehicle_no = document.getElementById("vehicle_no").value;
         const startReading = document.getElementById("start_reading").value;
         const endReading = document.getElementById("end_reading").value;
